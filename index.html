@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>About Me</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            color: #222;
+            line-height: 1.6;
+        }
+        header {
+            background: #111;
+            color: #fff;
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        h1,h2 { margin-top: 0; }
+        .section { margin-bottom: 30px; }
+        .tag-list span {
+            display: inline-block;
+            background: #222;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 4px 6px 0 0;
+            font-size: 14px;
+        }
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+        }
+        .weather-map-container {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            margin-top: 20px;
+        }
+        .weather-box {
+            background: #E0F7FA;
+            color: #004D40;
+            padding: 15px 20px;
+            border-radius: 12px;
+            border: 2px solid #00ACC1;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,172,193,0.25);
+            min-width: 240px;
+        }
+        iframe {
+            flex: 1 1 560px;
+            height: 350px;
+            border: 0;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+        }
+        #spinner {
+            width: 40px;
+            height: 40px;
+            border: 5px solid #00ACC1;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            margin: 18px auto;
+            display: none;
+        }
+        .spin {
+            animation: rotate 0.8s linear infinite;
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .small {
+            font-weight: normal;
+            font-size: 13px;
+            color: #004d40;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <div style="display:flex;align-items:center;justify-content:center;gap:20px;">
+        <img src="beach.jpg" alt="Akshat Photo" style="width:120px;height:120px;object-fit:cover;border-radius:50%;">
+        <div>
+            <h1 style="margin:0;">Akshat Yadav</h1>
+            <h1 style="margin:0;">Aadhaar No. - EE25B008</h1>
+            <p style="margin:5px 0 0 0;">Freshie • Aimless wanderer • Wannabe Tech Paglu</p>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <div class="section">
+        <h2>About Me</h2>
+        <p>
+            I am a B Tech freshie with a passion for electrical engineering and cybersecurity challenges, robotics and webdev.
+            I love exploring and dissecting software to understand its inner workings.
+            When I'm not busy with endsems or CTFs, I enjoy exploring interesting places on campus and beyond.
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Stuff I like to do</h2>
+        <div class="tag-list">
+            <span>Reverse Engineering, I really want to though I dont know how</span>
+            <span>CTFs</span>
+            <span>Understand websites and blockchains</span>
+            <span>Cool tech competitions with amazing teammates</span>
+            <span>Playing the flute</span>
+            <span>Music</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Aspirations</h2>
+        <p>
+            • Hack into something I shouldn't once<br>
+            • A pondi trip with my roommates<br>
+            • Raftaar comp team someday<br>
+            • Understand how stuff works at a deeper level
+        </p>
+    </div>
+
+    <div class="section">
+        <h2>Weather & Map of Lucknow</h2>
+        <div id="spinner"></div>
+        <div class="weather-map-container">
+            <div class="weather-box" id="weather">
+                Loading weather...
+                <div class="small" id="weather-source">using primary service</div>
+            </div>
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14253.7048172773!2d80.946165!3d26.846708!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x399bfd1ea2b1ebf1%3A0xf970f12e7260213!2sLucknow!5e0!3m2!1sen!2sin!4v1702080862858" loading="lazy"></iframe>
+        </div>
+    </div>
+</div>
+
+<footer>
+    ME@IITM 2025 • Made with HTML, CSS & JS
+</footer>
+
+<script>
+    const OPENWEATHER_KEY = "9372f7cb221ae1555629a4948171ff9a";
+
+    const spinner = document.getElementById("spinner");
+    const weatherBox = document.getElementById("weather");
+    const weatherSource = document.getElementById("weather-source");
+
+    function showSpinner() {
+        spinner.style.display = "block";
+        spinner.classList.add("spin");
+    }
+
+    function hideSpinner() {
+        spinner.classList.remove("spin");
+        spinner.style.display = "none";
+    }
+
+    async function fetchOpenWeather() {
+        const url = `https://api.openweathermap.org/data/2.5/weather?q=Lucknow&appid=${OPENWEATHER_KEY}&units=metric`;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('openweather-non-200');
+            const data = await res.json();
+            if (!data || !data.main) throw new Error('openweather-baddata');
+            return {
+                source: 'OpenWeatherMap',
+                temp: Math.round(data.main.temp),
+                desc: data.weather && data.weather[0] && data.weather[0].description ? data.weather[0].description : 'N/A',
+                humidity: data.main.humidity
+            };
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    async function fetchOpenMeteo() {
+        const lat = 26.846708;
+        const lon = 80.946165;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true`;
+        try {
+            const res = await fetch(url);
+            if (!res.ok) throw new Error('openmeteo-non-200');
+            const data = await res.json();
+            if (!data || !data.current_weather) throw new Error('openmeteo-baddata');
+            return {
+                source: 'Open-Meteo',
+                temp: Math.round(data.current_weather.temperature),
+                desc: 'current weather',
+                humidity: 'N/A'
+            };
+        } catch (e) {
+            throw e;
+        }
+    }
+
+    async function loadWeather() {
+        showSpinner();
+        weatherBox.textContent = 'Loading weather...';
+        weatherSource.textContent = 'attempting OpenWeatherMap';
+
+        if (OPENWEATHER_KEY && OPENWEATHER_KEY !== '9372f7cb221ae1555629a4948171ff9a') {
+            try {
+                const ow = await fetchOpenWeather();
+                weatherBox.innerHTML = `Lucknow Weather<br>Temp: ${ow.temp} °C<br>Condition: ${ow.desc}<br>Humidity: ${ow.humidity}%`;
+                weatherSource.textContent = ow.source;
+                hideSpinner();
+                return;
+            } catch (e) {
+                weatherSource.textContent = 'OpenWeatherMap failed, falling back';
+            }
+        } else {
+            weatherSource.textContent = 'OpenWeatherMap key not set, using fallback';
+        }
+
+        try {
+            const om = await fetchOpenMeteo();
+            weatherBox.innerHTML = `Lucknow Weather<br>Temp: ${om.temp} °C<br>Condition: ${om.desc}<br>Humidity: ${om.humidity}`;
+            weatherSource.textContent = om.source;
+        } catch {
+            weatherBox.textContent = 'Error loading weather';
+            weatherSource.textContent = 'no service available';
+        } finally {
+            hideSpinner();
+        }
+    }
+
+    window.addEventListener('scroll', () => {
+        spinner.style.display = 'block';
+        spinner.classList.add('spin');
+        clearTimeout(window._spinnerTO);
+        window._spinnerTO = setTimeout(() => {
+            spinner.classList.remove('spin');
+            spinner.style.display = 'none';
+        }, 900);
+    });
+
+    loadWeather();
+</script>
+</body>
+</html>
+
+
+
